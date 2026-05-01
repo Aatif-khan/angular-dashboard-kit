@@ -3,13 +3,15 @@ import { ThemeService } from '../../../core/services/theme.service';
 import { Store } from '@ngrx/store';
 import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectUser } from '../../../store/auth/auth.selectors';
-import { AsyncPipe, NgIf } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { AsyncPipe, NgIf, NgClass } from '@angular/common';
+import { RouterLink, RouterLinkActive } from '@angular/router';
+import { selectAllNotifications } from '../../../store/notification/notification.selectors';
+import { map } from 'rxjs';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [AsyncPipe, NgIf, RouterLink],
+  imports: [AsyncPipe, NgIf, RouterLink, RouterLinkActive, NgClass],
   template: `
     <header class="h-16 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-6 transition-colors duration-300 z-10 relative">
       <div class="flex items-center gap-4">
@@ -23,9 +25,15 @@ import { RouterLink } from '@angular/router';
         </button>
         
         <!-- Notifications -->
-        <button class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors relative">
+        <button 
+          routerLink="/notifications" 
+          routerLinkActive 
+          #rla="routerLinkActive"
+          class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 transition-colors relative"
+          [ngClass]="{'text-primary-600 dark:text-primary-400 bg-primary-50 dark:bg-primary-900/20': rla.isActive}"
+        >
           <span class="material-icons-outlined">notifications</span>
-          <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-dark-surface"></span>
+          <span *ngIf="(notificationCount$ | async) ?? 0 > 0" class="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-dark-surface"></span>
         </button>
         
         <!-- User Profile Dropdown -->
@@ -79,6 +87,7 @@ export class HeaderComponent {
   private store = inject(Store);
   
   user$ = this.store.select(selectUser);
+  notificationCount$ = this.store.select(selectAllNotifications).pipe(map(n => n.length));
   isDropdownOpen = signal(false);
 
   toggleDropdown() {
