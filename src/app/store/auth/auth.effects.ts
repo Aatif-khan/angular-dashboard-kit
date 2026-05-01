@@ -32,6 +32,7 @@ export class AuthEffects {
         ofType(AuthActions.loginSuccess),
         tap(({ response }) => {
           this.tokenService.setToken(response.token);
+          this.tokenService.setUser(response.user);
           this.router.navigate(['/dashboard']);
         })
       ),

@@ -3,7 +3,7 @@ import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformServer } from '@angular/common';
 import { TokenService } from '../services/token.service';
 
-export const authGuard: CanActivateFn = (route, state) => {
+export const guestGuard: CanActivateFn = (route, state) => {
   const tokenService = inject(TokenService);
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
@@ -13,8 +13,8 @@ export const authGuard: CanActivateFn = (route, state) => {
   }
 
   if (tokenService.getToken()) {
-    return true;
+    return router.createUrlTree(['/dashboard']);
   }
 
-  return router.createUrlTree(['/auth']);
+  return true;
 };
