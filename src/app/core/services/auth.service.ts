@@ -31,6 +31,17 @@ export class AuthService {
           roles: ['editor']
         }
       }).pipe(delay(800));
+    } else if (credentials.email === 'john.doe@example.com') {
+      return of({
+        token: 'mock-jwt-token-viewer-99999',
+        user: {
+          id: '3',
+          email: 'john.doe@example.com',
+          firstName: 'John',
+          lastName: 'Doe',
+          roles: ['viewer']
+        }
+      }).pipe(delay(800));
     }
     
     return throwError(() => new Error('Invalid email or password')).pipe(delay(800));
