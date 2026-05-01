@@ -13,28 +13,28 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
       <nav class="flex-1 overflow-y-auto py-4">
         <ul class="space-y-1 px-3">
           <li>
-            <a routerLink="/dashboard" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <span class="material-icons-outlined text-xl">dashboard</span>
+            <a routerLink="/dashboard" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-all duration-200 group">
+              <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform">dashboard</span>
               <span class="font-medium">Dashboard</span>
             </a>
           </li>
           <li>
-            <a routerLink="/users" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <span class="material-icons-outlined text-xl">people</span>
+            <a routerLink="/users" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-all duration-200 group">
+              <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform">people</span>
               <span class="font-medium">Users</span>
             </a>
           </li>
           <li>
-            <a routerLink="/reports" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-              <span class="material-icons-outlined text-xl">analytics</span>
+            <a routerLink="/reports" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-all duration-200 group">
+              <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform">analytics</span>
               <span class="font-medium">Reports</span>
             </a>
           </li>
         </ul>
       </nav>
       <div class="p-4 border-t border-slate-200 dark:border-dark-border">
-        <a routerLink="/settings" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
-          <span class="material-icons-outlined text-xl">settings</span>
+        <a routerLink="/settings" routerLinkActive="bg-primary-50 text-primary-600 dark:bg-primary-900/20 dark:text-primary-400 shadow-sm" class="flex items-center gap-3 px-3 py-2 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:translate-x-1 transition-all duration-200 group">
+          <span class="material-icons-outlined text-xl group-hover:scale-110 transition-transform">settings</span>
           <span class="font-medium">Settings</span>
         </a>
       </div>

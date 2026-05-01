@@ -1,10 +1,9 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-confirm-dialog',
   standalone: true,
-  imports: [NgIf],
+  imports: [],
   template: `
     <div class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
       <div class="bg-white dark:bg-dark-surface w-full max-w-sm rounded-2xl shadow-2xl border border-slate-200 dark:border-dark-border p-6 animate-in zoom-in duration-200">

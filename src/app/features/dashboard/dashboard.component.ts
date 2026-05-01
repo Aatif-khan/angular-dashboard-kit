@@ -34,7 +34,7 @@ interface KpiStats {
 
       <!-- KPI Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div *ngFor="let stat of kpiStats" class="card relative overflow-hidden group hover:border-primary-500/50 transition-colors">
+        <div *ngFor="let stat of kpiStats" class="card relative overflow-hidden group hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-500/5 transition-all duration-300">
           <div class="flex justify-between items-start">
             <div>
               <p class="text-sm font-medium text-slate-500 dark:text-slate-400">{{ stat.title }}</p>

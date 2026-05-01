@@ -12,6 +12,7 @@ import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialo
 import { User } from '../../../core/models/auth.model';
 import { selectUser } from '../../../store/auth/auth.selectors';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { NotificationService } from '../../../core/services/notification.service';
 
 @Component({
   standalone: true,
@@ -144,6 +145,7 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 })
 export class UserListComponent implements OnInit {
   private store = inject(Store);
+  private notify = inject(NotificationService);
 
   searchControl = new FormControl('');
   roleFilterControl = new FormControl('all');
@@ -193,6 +195,7 @@ export class UserListComponent implements OnInit {
   onConfirmDelete() {
     if (this.userToDelete) {
       this.store.dispatch(UserActions.deleteUser({ id: this.userToDelete.id }));
+      this.notify.success(`User "${this.userToDelete.firstName}" deleted successfully`);
     }
     this.closeConfirm();
   }
@@ -239,8 +242,10 @@ export class UserListComponent implements OnInit {
   onSave(userData: any) {
     if (this.selectedUser) {
       this.store.dispatch(UserActions.updateUser({ user: userData }));
+      this.notify.success('User updated successfully');
     } else {
       this.store.dispatch(UserActions.addUser({ user: userData }));
+      this.notify.success('New user created successfully');
     }
     this.closeModal();
   }
