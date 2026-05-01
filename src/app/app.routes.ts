@@ -48,13 +48,13 @@ export const routes: Routes = [
           import('./features/users/users.routes').then((m) => m.usersRoutes),
       },
 
-      // Reports / Data Table
+      // Reports / Analytics
       {
         path: 'reports',
-        title: 'Reports',
+        title: 'Platform Analytics',
         loadComponent: () =>
-          import('./features/reports/data-table/data-table.component').then(
-            (m) => m.DataTableComponent,
+          import('./features/reports/reports.component').then(
+            (m) => m.ReportsComponent,
           ),
       },
 
