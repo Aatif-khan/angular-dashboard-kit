@@ -1,12 +1,12 @@
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { NgIf, NgFor } from '@angular/common';
+
 import { User } from '../../../core/models/auth.model';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   template: `
     <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
       <div class="bg-white dark:bg-dark-surface w-full max-w-md rounded-2xl shadow-2xl overflow-hidden border border-slate-200 dark:border-dark-border animate-in fade-in zoom-in duration-200">
