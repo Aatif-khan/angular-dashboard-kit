@@ -4,11 +4,12 @@ import { Store } from '@ngrx/store';
 import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectUser } from '../../../store/auth/auth.selectors';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [AsyncPipe, NgIf],
+  imports: [AsyncPipe, NgIf, RouterLink],
   template: `
     <header class="h-16 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md border-b border-slate-200 dark:border-dark-border flex items-center justify-between px-6 transition-colors duration-300 z-10 relative">
       <div class="flex items-center gap-4">
@@ -46,6 +47,18 @@ import { AsyncPipe, NgIf } from '@angular/common';
             </div>
             <ul class="py-1">
               <li>
+                <a routerLink="/profile" (click)="isDropdownOpen.set(false)" class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2 transition-colors">
+                  <span class="material-icons-outlined text-sm">person</span>
+                  My Profile
+                </a>
+              </li>
+              <li>
+                <a routerLink="/settings" (click)="isDropdownOpen.set(false)" class="w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2 transition-colors">
+                  <span class="material-icons-outlined text-sm">settings</span>
+                  Settings
+                </a>
+              </li>
+              <li class="border-t border-slate-100 dark:border-dark-border mt-1 pt-1">
                 <button (click)="logout()" class="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-slate-50 dark:hover:bg-slate-800/50 flex items-center gap-2 transition-colors">
                   <span class="material-icons-outlined text-sm">logout</span>
                   Sign out
