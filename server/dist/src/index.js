@@ -26,6 +26,7 @@ app.use(cors());
 app.use(express.json());
 import authRoutes from './routes/auth.routes.js';
 import userRoutes from './routes/user.routes.js';
+import { globalErrorHandler } from './utils/error.handler.js';
 // Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', message: 'Server is running' });
@@ -33,6 +34,8 @@ app.get('/api/health', (req, res) => {
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
+// Global Error Handler (Must be last)
+app.use(globalErrorHandler);
 app.listen(PORT, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}`);
 });

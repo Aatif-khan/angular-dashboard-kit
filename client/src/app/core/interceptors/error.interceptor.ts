@@ -36,7 +36,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         } else if (error.status === 403) {
           errorMessage = 'You do not have permission to access this resource.';
         } else if (error.status === 404) {
-          errorMessage = 'The requested resource was not found.';
+          // Prioritize the server's custom error message for 404s
+          errorMessage = error.error?.message || 'The requested resource was not found.';
         }
       }
 
