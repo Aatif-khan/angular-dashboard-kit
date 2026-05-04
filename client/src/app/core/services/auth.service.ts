@@ -16,4 +16,12 @@ export class AuthService {
   logout(): void {
     this.tokenService.removeToken();
   }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.api.post<any>('auth/forgot-password', { email });
+  }
+
+  resetPassword(data: any): Observable<any> {
+    return this.api.post<any>('auth/reset-password', data);
+  }
 }

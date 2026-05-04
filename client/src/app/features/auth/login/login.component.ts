@@ -4,11 +4,12 @@ import { Store } from '@ngrx/store';
 import { AuthActions } from '../../../store/auth/auth.actions';
 import { selectAuthLoading, selectAuthError } from '../../../store/auth/auth.selectors';
 import { AsyncPipe, NgIf } from '@angular/common';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, AsyncPipe, NgIf],
+  imports: [ReactiveFormsModule, AsyncPipe, NgIf, RouterLink],
   template: `
     <div class="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-dark-bg transition-colors duration-300 p-4">
       <div class="card w-full max-w-md relative overflow-hidden">
@@ -47,7 +48,7 @@ import { AsyncPipe, NgIf } from '@angular/common';
             <div>
               <div class="flex justify-between items-center mb-1.5">
                 <label for="password" class="block text-sm font-medium text-slate-700 dark:text-slate-300">Password</label>
-                <a href="#" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Forgot password?</a>
+                <a routerLink="/auth/forgot-password" class="text-sm font-medium text-primary-600 hover:text-primary-500 dark:text-primary-400">Forgot password?</a>
               </div>
               <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
