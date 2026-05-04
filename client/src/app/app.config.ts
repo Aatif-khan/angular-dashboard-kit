@@ -3,6 +3,8 @@ import {
   provideRouter,
   withComponentInputBinding,
   withViewTransitions,
+  withPreloading,
+  PreloadAllModules,
 } from '@angular/router';
 import {
   provideHttpClient,
@@ -32,6 +34,7 @@ export const appConfig: ApplicationConfig = {
       routes,
       withComponentInputBinding(),       // bind route params directly to @Input()
       withViewTransitions(),             // smooth view transition animations
+      withPreloading(PreloadAllModules), // background load feature modules
     ),
 
     // ─── HTTP Client ─────────────────────────────────────────────────────────
