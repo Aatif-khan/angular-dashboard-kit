@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { prisma } from '../index.js';
 import bcrypt from 'bcryptjs';
 import { catchAsync, AppError } from '../utils/error.handler.js';
+import { AuthRequest } from '../middleware/auth.middleware.js';
 
 export const getUsers = catchAsync(async (req: Request, res: Response) => {
   const users = await prisma.user.findMany({
@@ -53,4 +54,70 @@ export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   await prisma.user.delete({ where: { id: id as string } });
   
   res.json({ message: 'User deleted successfully' });
+});
+
+export const getProfile = catchAsync(async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.id;
+  
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      roles: true
+    }
+  });
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  res.json(user);
+});
+
+export const updateProfile = catchAsync(async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.id;
+  const { firstName, lastName, email } = req.body;
+
+  const user = await prisma.user.update({
+    where: { id: userId },
+    data: { firstName, lastName, email },
+    select: {
+      id: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      roles: true
+    }
+  });
+
+  res.json(user);
+});
+
+export const updatePassword = catchAsync(async (req: AuthRequest, res: Response) => {
+  const userId = req.user?.id;
+  const { currentPassword, newPassword } = req.body;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId }
+  });
+
+  if (!user) {
+    throw new AppError('User not found', 404);
+  }
+
+  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+  if (!isPasswordValid) {
+    throw new AppError('Current password is incorrect', 401);
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+  await prisma.user.update({
+    where: { id: userId },
+    data: { password: hashedPassword }
+  });
+
+  res.json({ message: 'Password updated successfully' });
 });

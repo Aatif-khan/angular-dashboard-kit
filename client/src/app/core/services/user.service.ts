@@ -22,4 +22,16 @@ export class UserService {
   deleteUser(id: string): Observable<string> {
     return this.api.delete<string>(`users/${id}`);
   }
+
+  getProfile(): Observable<User> {
+    return this.api.get<User>('users/profile');
+  }
+
+  updateProfile(user: Partial<User>): Observable<User> {
+    return this.api.put<User>('users/profile', user);
+  }
+
+  updatePassword(passwords: any): Observable<any> {
+    return this.api.put<any>('users/profile/password', passwords);
+  }
 }

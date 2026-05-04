@@ -2,11 +2,9 @@ import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { selectUser } from '../../store/auth/auth.selectors';
 import { NotificationService } from '../../core/services/notification.service';
 import { ThemeService } from '../../core/services/theme.service';
-import { toObservable } from '@angular/core/rxjs-interop';
-import { map, take } from 'rxjs';
+import { UserService } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -101,12 +99,11 @@ import { map, take } from 'rxjs';
               </div>
               <div class="space-y-1">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Address</label>
-                <input type="email" formControlName="email" readonly class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-slate-50 dark:bg-slate-800/50 text-slate-500 cursor-not-allowed outline-none">
-                <p class="text-[11px] text-slate-400 mt-1 italic">Email address cannot be changed. Contact admin for updates.</p>
+                <input type="email" formControlName="email" class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface text-slate-900 dark:text-white focus:ring-2 focus:ring-primary-500/20 outline-none transition-all">
               </div>
               <div class="pt-4 border-t border-slate-100 dark:border-dark-border flex justify-end">
-                <button type="submit" [disabled]="profileForm.invalid || profileForm.pristine" class="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-bold shadow-lg shadow-primary-500/20 hover:bg-primary-700 transition-all disabled:opacity-50">
-                  Save Changes
+                <button type="submit" [disabled]="profileForm.invalid || profileForm.pristine || isLoading" class="px-6 py-2.5 bg-primary-600 text-white rounded-xl font-bold shadow-lg shadow-primary-500/20 hover:bg-primary-700 transition-all disabled:opacity-50">
+                  {{ isLoading ? 'Saving...' : 'Save Changes' }}
                 </button>
               </div>
             </form>
@@ -141,18 +138,18 @@ import { map, take } from 'rxjs';
           <!-- Security Tab -->
           <div *ngIf="activeTab === 'security'" class="card animate-in fade-in slide-in-from-bottom-4 duration-300">
             <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-6">Security Settings</h3>
-            <form class="space-y-4">
+            <form [formGroup]="passwordForm" (ngSubmit)="updatePassword()" class="space-y-4">
               <div class="space-y-1">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Current Password</label>
-                <input type="password" class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface outline-none focus:ring-2 focus:ring-primary-500/20">
+                <input type="password" formControlName="currentPassword" class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface outline-none focus:ring-2 focus:ring-primary-500/20">
               </div>
               <div class="space-y-1">
                 <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">New Password</label>
-                <input type="password" class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface outline-none focus:ring-2 focus:ring-primary-500/20">
+                <input type="password" formControlName="newPassword" class="form-input block w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-dark-border bg-white dark:bg-dark-surface outline-none focus:ring-2 focus:ring-primary-500/20">
               </div>
               <div class="pt-4 border-t border-slate-100 dark:border-dark-border flex justify-end">
-                <button type="button" (click)="updatePassword()" class="px-6 py-2.5 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-[1.02]">
-                  Update Password
+                <button type="submit" [disabled]="passwordForm.invalid || isLoading" class="px-6 py-2.5 bg-slate-900 dark:bg-white dark:text-slate-900 text-white rounded-xl font-bold shadow-lg transition-all hover:scale-[1.02] disabled:opacity-50">
+                  {{ isLoading ? 'Updating...' : 'Update Password' }}
                 </button>
               </div>
             </form>
@@ -167,45 +164,69 @@ export class ProfileComponent implements OnInit {
   private store = inject(Store);
   private fb = inject(FormBuilder);
   private notify = inject(NotificationService);
+  private userService = inject(UserService);
   public themeService = inject(ThemeService);
 
   activeTab: 'profile' | 'preferences' | 'security' = 'profile';
   profileForm!: FormGroup;
+  passwordForm!: FormGroup;
   userInitials = '';
+  isLoading = false;
 
   ngOnInit() {
-    this.initForm();
-    
-    this.store.select(selectUser).pipe(take(1)).subscribe(user => {
-      if (user) {
-        this.profileForm.patchValue({
-          firstName: user.firstName,
-          lastName: user.lastName,
-          email: user.email
-        });
+    this.initForms();
+    this.loadProfile();
+  }
+
+  private initForms() {
+    this.profileForm = this.fb.group({
+      firstName: ['', [Validators.required]],
+      lastName: ['', [Validators.required]],
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.passwordForm = this.fb.group({
+      currentPassword: ['', [Validators.required]],
+      newPassword: ['', [Validators.required, Validators.minLength(6)]]
+    });
+  }
+
+  private loadProfile() {
+    this.userService.getProfile().subscribe({
+      next: (user) => {
+        this.profileForm.patchValue(user);
         this.userInitials = `${user.firstName[0]}${user.lastName[0]}`;
       }
     });
   }
 
-  private initForm() {
-    this.profileForm = this.fb.group({
-      firstName: ['', [Validators.required]],
-      lastName: ['', [Validators.required]],
-      email: [{ value: '', disabled: true }]
-    });
-  }
-
   updateProfile() {
     if (this.profileForm.valid) {
-      // In a real app, dispatch an action
-      this.notify.success('Profile updated successfully!');
-      this.profileForm.markAsPristine();
+      this.isLoading = true;
+      this.userService.updateProfile(this.profileForm.value).subscribe({
+        next: (user) => {
+          this.notify.success('Profile updated successfully!');
+          this.profileForm.markAsPristine();
+          this.userInitials = `${user.firstName[0]}${user.lastName[0]}`;
+          this.isLoading = false;
+        },
+        error: () => this.isLoading = false
+      });
     }
   }
 
   updatePassword() {
-    this.notify.info('Password update feature coming soon!');
+    if (this.passwordForm.valid) {
+      this.isLoading = true;
+      this.userService.updatePassword(this.passwordForm.value).subscribe({
+        next: () => {
+          this.notify.success('Password updated successfully!');
+          this.passwordForm.reset();
+          this.isLoading = false;
+        },
+        error: () => this.isLoading = false
+      });
+    }
   }
 
   toggleTheme() {
@@ -221,7 +242,6 @@ export class ProfileComponent implements OnInit {
         this.notify.error('File size exceeds 2MB limit');
         return;
       }
-      // Mock upload success
       this.notify.success('Profile photo uploaded successfully! (Mock)');
     }
   }
