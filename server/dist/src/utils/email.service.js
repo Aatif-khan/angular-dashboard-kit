@@ -1,29 +1,23 @@
 import sgMail from '@sendgrid/mail';
 import { mailConfig, logger } from '../config/index.js';
-
-export const sendResetPasswordEmail = async (email: string, resetToken: string) => {
-  const apiKey = mailConfig.apiKey;
-  const fromEmail = mailConfig.fromEmail;
-  
-  logger.info(`📤 Attempting to send email FROM: "${fromEmail}" TO: "${email}"`);
-
-  if (!apiKey || !fromEmail) {
-    logger.warn('⚠️ SendGrid credentials missing in env validation. Falling back to terminal logging.');
-    return;
-  }
-
-  sgMail.setApiKey(apiKey);
-
-  const resetLink = `http://localhost:4200/auth/reset-password?token=${resetToken}`;
-
-  const msg = {
-    to: email,
-    from: {
-      email: fromEmail,
-      name: 'DashKit Admin'
-    },
-    subject: 'Password Reset Request - DashKit',
-    html: `
+export const sendResetPasswordEmail = async (email, resetToken) => {
+    const apiKey = mailConfig.apiKey;
+    const fromEmail = mailConfig.fromEmail;
+    logger.info(`📤 Attempting to send email FROM: "${fromEmail}" TO: "${email}"`);
+    if (!apiKey || !fromEmail) {
+        logger.warn('⚠️ SendGrid credentials missing in env validation. Falling back to terminal logging.');
+        return;
+    }
+    sgMail.setApiKey(apiKey);
+    const resetLink = `http://localhost:4200/auth/reset-password?token=${resetToken}`;
+    const msg = {
+        to: email,
+        from: {
+            email: fromEmail,
+            name: 'DashKit Admin'
+        },
+        subject: 'Password Reset Request - DashKit',
+        html: `
       <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;">
         <h2 style="color: #0f172a; margin-bottom: 16px;">Reset Your Password</h2>
         <p style="color: #475569; line-height: 1.6;">You requested to reset your password for your DashKit account. Click the button below to set a new one. This link is valid for 1 hour.</p>
@@ -35,13 +29,13 @@ export const sendResetPasswordEmail = async (email: string, resetToken: string) 
         <p style="color: #64748b; font-size: 12px;">DashKit Admin Team</p>
       </div>
     `,
-  };
-
-  try {
-    await sgMail.send(msg);
-    logger.info(`📧 Reset email sent to ${email} via SendGrid`);
-  } catch (error: any) {
-    logger.error('❌ SendGrid Error:', error.response?.body || error.message);
-    throw new Error('Failed to send reset email');
-  }
+    };
+    try {
+        await sgMail.send(msg);
+        logger.info(`📧 Reset email sent to ${email} via SendGrid`);
+    }
+    catch (error) {
+        logger.error('❌ SendGrid Error:', error.response?.body || error.message);
+        throw new Error('Failed to send reset email');
+    }
 };

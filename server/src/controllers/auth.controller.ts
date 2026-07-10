@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { prisma } from '../index.js';
 import { catchAsync, AppError } from '../utils/error.handler.js';
 import { sendResetPasswordEmail } from '../utils/email.service.js';
+import { jwtConfig } from '../config/index.js';
 
 export const register = catchAsync(async (req: Request, res: Response) => {
   const { email, password, firstName, lastName } = req.body;
@@ -39,8 +40,8 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
   const token = jwt.sign(
     { id: user.id, email: user.email, roles: user.roles },
-    process.env.JWT_SECRET || 'fallback_secret',
-    { expiresIn: '24h' }
+    jwtConfig.secret,
+    { expiresIn: jwtConfig.expiresIn }
   );
 
   res.json({
