@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { jwtConfig } from '../config/index.js';
 
 export interface AuthRequest extends Request {
   user?: {
@@ -19,7 +20,7 @@ export const authenticateJWT = (req: AuthRequest, res: Response, next: NextFunct
       return res.status(401).json({ error: 'Authentication token missing' });
     }
 
-    jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err: any, user: any) => {
+    jwt.verify(token, jwtConfig.secret, (err: any, user: any) => {
       if (err) {
         return res.status(403).json({ error: 'Token is invalid or expired' });
       }

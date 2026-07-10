@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken';
+import { jwtConfig } from '../config/index.js';
 export const authenticateJWT = (req, res, next) => {
     const authHeader = req.headers.authorization;
     if (authHeader) {
@@ -6,7 +7,7 @@ export const authenticateJWT = (req, res, next) => {
         if (!token) {
             return res.status(401).json({ error: 'Authentication token missing' });
         }
-        jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret', (err, user) => {
+        jwt.verify(token, jwtConfig.secret, (err, user) => {
             if (err) {
                 return res.status(403).json({ error: 'Token is invalid or expired' });
             }

@@ -3,6 +3,8 @@ import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { prisma } from '../index.js';
 import { catchAsync, AppError } from '../utils/error.handler.js';
+import { sendResetPasswordEmail } from '../utils/email.service.js';
+import { jwtConfig } from '../config/index.js';
 export const register = catchAsync(async (req, res) => {
     const { email, password, firstName, lastName } = req.body;
     const existingUser = await prisma.user.findUnique({ where: { email } });
@@ -27,7 +29,7 @@ export const login = catchAsync(async (req, res) => {
     if (!user || !(await bcrypt.compare(password, user.password))) {
         throw new AppError('Invalid email or password', 401);
     }
-    const token = jwt.sign({ id: user.id, email: user.email, roles: user.roles }, process.env.JWT_SECRET || 'fallback_secret', { expiresIn: '24h' });
+    const token = jwt.sign({ id: user.id, email: user.email, roles: user.roles }, jwtConfig.secret, { expiresIn: jwtConfig.expiresIn });
     res.json({
         token,
         user: {
@@ -43,8 +45,7 @@ export const forgotPassword = catchAsync(async (req, res) => {
     const { email } = req.body;
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-        // We send success even if user doesn't exist for security (prevent email enumeration)
-        return res.json({ message: 'If an account exists with that email, a reset link has been sent.' });
+        throw new AppError('No account found with that email address.', 404);
     }
     const resetToken = crypto.randomBytes(32).toString('hex');
     const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
@@ -61,6 +62,8 @@ export const forgotPassword = catchAsync(async (req, res) => {
     console.log(`Token: ${resetToken}`);
     console.log(`Link: http://localhost:4200/auth/reset-password?token=${resetToken}`);
     console.log('-------------------------------------------');
+    // SEND REAL EMAIL VIA SENDGRID
+    await sendResetPasswordEmail(email, resetToken);
     res.json({ message: 'Reset link sent to email.' });
 });
 export const resetPassword = catchAsync(async (req, res) => {
