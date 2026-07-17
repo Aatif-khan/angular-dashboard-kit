@@ -50,4 +50,18 @@ export class UserRepository extends BaseRepository<
   public async deleteUser(id: string): Promise<User> {
     return this.delete(id);
   }
+
+  /**
+   * Find a user by their unexpired password reset token.
+   */
+  public async findByResetToken(token: string): Promise<User | null> {
+    return this.model.findFirst({
+      where: {
+        resetToken: token,
+        resetTokenExpiry: {
+          gt: new Date(),
+        },
+      },
+    });
+  }
 }
