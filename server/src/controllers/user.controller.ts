@@ -1,123 +1,77 @@
 import { Request, Response } from 'express';
-import { prisma } from '../index.js';
-import bcrypt from 'bcryptjs';
-import { catchAsync, AppError } from '../utils/error.handler.js';
+import { UserService } from '../services/user.service.js';
+import { ResponseHelper } from '../helpers/response.helper.js';
+import { catchAsync } from '../utils/error.handler.js';
 import { AuthRequest } from '../middleware/auth.middleware.js';
 
+const userService = new UserService();
+
+/**
+ * Retrieves all users.
+ */
 export const getUsers = catchAsync(async (req: Request, res: Response) => {
-  const users = await prisma.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      roles: true,
-      createdAt: true
-    }
-  });
-  res.json(users);
+  const users = await userService.getUsers();
+  return ResponseHelper.success(res, users);
 });
 
+/**
+ * Creates a new user.
+ */
 export const createUser = catchAsync(async (req: Request, res: Response) => {
-  const { email, password, firstName, lastName, roles } = req.body;
-  
-  const hashedPassword = await bcrypt.hash(password || 'default123', 10);
-  
-  const user = await prisma.user.create({
-    data: {
-      email,
-      password: hashedPassword,
-      firstName,
-      lastName,
-      roles: roles || ['viewer']
-    }
-  });
-  
-  res.status(201).json(user);
+  const user = await userService.createUser(req.body);
+  return ResponseHelper.created(res, user);
 });
 
+/**
+ * Updates a user by ID.
+ */
 export const updateUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { email, firstName, lastName, roles } = req.body;
-  
-  const user = await prisma.user.update({
-    where: { id: id as string },
-    data: { email, firstName, lastName, roles }
-  });
-  
-  res.json(user);
+  const user = await userService.updateUser(id as string, req.body);
+  return ResponseHelper.success(res, user);
 });
 
+/**
+ * Deletes a user by ID.
+ */
 export const deleteUser = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  
-  await prisma.user.delete({ where: { id: id as string } });
-  
-  res.json({ message: 'User deleted successfully' });
+  await userService.deleteUser(id as string);
+  return ResponseHelper.success(res, null, 'User deleted successfully');
 });
 
+/**
+ * Retrieves the profile of the currently authenticated user.
+ */
 export const getProfile = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
-  
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      roles: true
-    }
-  });
-
-  if (!user) {
-    throw new AppError('User not found', 404);
+  if (!userId) {
+    return ResponseHelper.error(res, 'User not authenticated', null, 401);
   }
-
-  res.json(user);
+  const user = await userService.getProfile(userId);
+  return ResponseHelper.success(res, user);
 });
 
+/**
+ * Updates the profile of the currently authenticated user.
+ */
 export const updateProfile = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
-  const { firstName, lastName, email } = req.body;
-
-  const user = await prisma.user.update({
-    where: { id: userId },
-    data: { firstName, lastName, email },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      roles: true
-    }
-  });
-
-  res.json(user);
+  if (!userId) {
+    return ResponseHelper.error(res, 'User not authenticated', null, 401);
+  }
+  const user = await userService.updateProfile(userId, req.body);
+  return ResponseHelper.success(res, user);
 });
 
+/**
+ * Updates the password of the currently authenticated user.
+ */
 export const updatePassword = catchAsync(async (req: AuthRequest, res: Response) => {
   const userId = req.user?.id;
-  const { currentPassword, newPassword } = req.body;
-
-  const user = await prisma.user.findUnique({
-    where: { id: userId }
-  });
-
-  if (!user) {
-    throw new AppError('User not found', 404);
+  if (!userId) {
+    return ResponseHelper.error(res, 'User not authenticated', null, 401);
   }
-
-  const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
-  if (!isPasswordValid) {
-    throw new AppError('Current password is incorrect', 401);
-  }
-
-  const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await prisma.user.update({
-    where: { id: userId },
-    data: { password: hashedPassword }
-  });
-
-  res.json({ message: 'Password updated successfully' });
+  await userService.updatePassword(userId, req.body);
+  return ResponseHelper.success(res, null, 'Password updated successfully');
 });

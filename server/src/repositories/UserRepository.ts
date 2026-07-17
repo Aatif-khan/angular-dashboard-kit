@@ -64,4 +64,56 @@ export class UserRepository extends BaseRepository<
       },
     });
   }
+
+  /**
+   * Find all users projecting only non-sensitive fields.
+   */
+  public async findAll(): Promise<Partial<User>[]> {
+    return this.model.findMany({
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        roles: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  /**
+   * Find a user profile projecting non-sensitive fields.
+   */
+  public async findProfileById(id: string): Promise<Partial<User> | null> {
+    return this.model.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        roles: true,
+      },
+    });
+  }
+
+  /**
+   * Update profile fields projecting non-sensitive fields.
+   */
+  public async updateProfile(
+    id: string,
+    data: Prisma.UserUpdateInput
+  ): Promise<Partial<User>> {
+    return this.model.update({
+      where: { id },
+      data,
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        roles: true,
+      },
+    });
+  }
 }
